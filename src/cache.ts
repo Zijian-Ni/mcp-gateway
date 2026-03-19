@@ -25,7 +25,7 @@ export class Cache {
   /**
    * Get a cached result, returns undefined if not found or expired
    */
-  get(key: string): unknown | undefined {
+  get(key: string): unknown {
     if (!this.config.enabled) return undefined;
 
     const entry = this.store.get(key);

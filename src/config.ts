@@ -37,24 +37,24 @@ const apiKeySchema = z.object({
 });
 
 const rateLimitSchema = z.object({
-  tokensPerMinute: z.number().positive().default(60),
-  burstSize: z.number().positive().default(10),
+  tokensPerMinute: z.coerce.number().positive().default(60),
+  burstSize: z.coerce.number().positive().default(10),
 });
 
 const cacheSchema = z.object({
   enabled: z.boolean().default(true),
-  maxSize: z.number().positive().default(1000),
-  ttlSeconds: z.number().positive().default(300),
+  maxSize: z.coerce.number().positive().default(1000),
+  ttlSeconds: z.coerce.number().positive().default(300),
 });
 
 const loggingSchema = z.object({
   dbPath: z.string().default('./mcp-gateway.db'),
-  maxParamLength: z.number().positive().default(500),
+  maxParamLength: z.coerce.number().positive().default(500),
 });
 
 const gatewayConfigSchema = z.object({
   gateway: z.object({
-    port: z.number().min(1).max(65535).default(3000),
+    port: z.coerce.number().min(1).max(65535).default(3000),
     host: z.string().default('127.0.0.1'),
     requireAuth: z.boolean().default(true),
   }),
@@ -69,12 +69,13 @@ const gatewayConfigSchema = z.object({
  * Resolve ${VAR} and ${VAR:-default} syntax in strings
  */
 function resolveEnvVars(value: string): string {
-  return value.replace(/\$\{([^}]+)\}/g, (match, expr) => {
-    const [varName, defaultValue] = expr.split(':-');
-    const resolved = process.env[varName.trim()];
+  return value.replace(/\$\{([^}]+)\}/g, (match, expr: string) => {
+    const [varName, defaultValue] = expr.split(':-') as [string, string | undefined];
+    const trimmedName = varName.trim();
+    const resolved = process.env[trimmedName];
     if (resolved !== undefined) return resolved;
     if (defaultValue !== undefined) return defaultValue;
-    console.warn(`Warning: environment variable ${varName} is not set`);
+    console.warn(`Warning: environment variable ${trimmedName} is not set`);
     return match;
   });
 }
