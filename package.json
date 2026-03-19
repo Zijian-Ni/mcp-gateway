@@ -1,0 +1,73 @@
+{
+  "name": "@niclaw/mcp-gateway",
+  "version": "0.1.0",
+  "description": "A lightweight MCP (Model Context Protocol) Gateway providing unified routing, auth, logging, and rate limiting for multiple MCP servers",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcpx": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build && npm run lint && npm run typecheck && npm test",
+    "clean": "rm -rf dist",
+    "start": "node dist/index.js start"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "gateway",
+    "llm",
+    "ai",
+    "proxy",
+    "router"
+  ],
+  "author": {
+    "name": "Zijian Ni",
+    "url": "https://github.com/Zijian-Ni"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "better-sqlite3": "^9.4.3",
+    "commander": "^12.0.0",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "@vitest/coverage-v8": "^1.2.2",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "files": [
+    "dist",
+    "config.example.yaml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zijian-Ni/mcp-gateway.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Zijian-Ni/mcp-gateway/issues"
+  },
+  "homepage": "https://github.com/Zijian-Ni/mcp-gateway#readme"
+}

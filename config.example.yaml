@@ -1,0 +1,81 @@
+# mcp-gateway Configuration Example
+# Copy this file to config.yaml and customize for your setup.
+# Supports ${ENV_VAR} and ${ENV_VAR:-default} syntax for secrets.
+
+gateway:
+  # Port for the gateway's HTTP API
+  port: 3000
+  # Bind address (use 0.0.0.0 to expose externally)
+  host: "127.0.0.1"
+  # Require API key authentication from clients
+  requireAuth: true
+
+# Upstream MCP servers — the gateway proxies tool calls to these
+servers:
+  # --- stdio transport: spawn a local process ---
+  - name: filesystem
+    transport: stdio
+    command: npx
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-filesystem"
+      - "/home/user/documents"
+    description: "Local filesystem access"
+    timeout: 15000  # ms (default: 30000)
+
+  # --- stdio with environment variables ---
+  - name: github
+    transport: stdio
+    command: npx
+    args: ["-y", "@modelcontextprotocol/server-github"]
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "${GITHUB_TOKEN}"
+    description: "GitHub API tools"
+
+  # --- SSE transport: connect to a remote server ---
+  - name: remote-tools
+    transport: sse
+    url: "http://remote-server:8080/sse"
+    description: "Remote tool server via SSE"
+
+  # --- Streamable HTTP transport ---
+  - name: cloud-tools
+    transport: http
+    url: "https://tools.example.com/mcp"
+    description: "Cloud-hosted MCP server"
+
+# API keys for authenticating gateway clients
+apiKeys:
+  - key: "${GATEWAY_API_KEY}"
+    name: "my-agent"
+    # Leave empty arrays (or omit) to allow all tools/servers
+    allowedTools: []
+    allowedServers: []
+    # Optional: per-key rate limit override (tokens per minute)
+    rateLimit: 120
+
+  - key: "${READONLY_API_KEY}"
+    name: "readonly-agent"
+    # Restrict to specific tools only
+    allowedTools:
+      - "read_file"
+      - "list_directory"
+      - "search_files"
+    allowedServers:
+      - "filesystem"
+
+# Global rate limiting (token bucket algorithm)
+rateLimit:
+  tokensPerMinute: 60  # Refill rate
+  burstSize: 10        # Max burst capacity
+
+# Response cache (LRU with TTL)
+cache:
+  enabled: true
+  maxSize: 1000      # Max cached entries
+  ttlSeconds: 300    # 5 minutes
+
+# Request logging (SQLite)
+logging:
+  dbPath: "./mcp-gateway.db"
+  maxParamLength: 500  # Truncate logged params beyond this length
